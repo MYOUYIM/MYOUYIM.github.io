@@ -1,0 +1,30 @@
+:root {
+  --bg: #FFF8E7;
+  --card: #FFFDF5;
+  --text: #5C4B3A;
+  --light-text: #8B7A68;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 160px;
+  height: 160px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath d='M40 140 Q30 100 50 80 Q70 60 90 70 Q110 50 130 65 Q150 55 160 80 Q170 110 155 140 Q140 160 120 155 Q100 165 80 150 Q60 160 40 140 Z' fill='none' stroke='%23D4B483' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='75' cy='95' r
