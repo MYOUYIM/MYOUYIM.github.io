@@ -4,6 +4,7 @@
   --text: #5C4B3A;
   --light-text: #8B7A68;
   --accent: #E8D5A3;
+  --link: #8B6B3A;
 }
 
 * {
@@ -99,9 +100,35 @@ h1 {
   margin-bottom: 12px;
 }
 
+/* 链接样式优化 */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-all; /* 长链接可以换行 */
+}
+
+a:hover {
+  color: #6B4E2A;
+}
+
+address {
+  font-style: normal;
+  line-height: 1.8;
+  margin-top: 8px;
+}
+
+address p {
+  margin-bottom: 4px;
+}
+
 footer {
   text-align: center;
   margin-top: 50px;
   color: var(--light-text);
   font-size: 0.85rem;
+}
+
+footer p {
+  margin-bottom: 6px;
 }
