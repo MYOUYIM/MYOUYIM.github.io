@@ -1,0 +1,14 @@
+title: 我的小窝
+description: 慢慢来，比较快
+baseurl: ""
+url: "https://myouyim.github.io"
+
+markdown: kramdown
+permalink: /:title/
+
+# 时区
+timezone: Asia/Shanghai
+
+# 排除不需要的文件
+exclude:
+  - README.md
