@@ -13,12 +13,12 @@
       <p class="subtitle">{{ site.description }}</p>
     </header>
 
-    <nav class="categories">
-      <a href="{{ '/' | relative_url }}" class="cat-btn {% if page.url == '/' %}active{% endif %}">其他</a>
-      <a href="{{ '/daily/' | relative_url }}" class="cat-btn">日常</a>
-      <a href="{{ '/archive/' | relative_url }}" class="cat-btn">归档</a>
-      <a href="{{ '/about/' | relative_url }}" class="cat-btn">关于</a>
-    </nav>
+<nav class="categories">
+  <a href="{{ '/' | relative_url }}" class="cat-btn {% if page.url == '/' %}active{% endif %}">其他</a>
+  <a href="{{ '/daily.html' | relative_url }}" class="cat-btn">日常</a>
+  <a href="{{ '/thought.html' | relative_url }}" class="cat-btn">归档</a>
+  <a href="{{ '/cat.html' | relative_url }}" class="cat-btn">关于</a>
+</nav>
 
     <main>
       {{ content }}
