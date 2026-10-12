@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% if page.title %}{{ page.title }} - {% endif %}{{ site.title }}</title>
+  <link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><a href="{{ '/' | relative_url }}" style="text-decoration:none; color:inherit;">{{ site.title }}</a></h1>
+      <p class="subtitle">{{ site.description }}</p>
+    </header>
+
+    <nav class="categories">
+      <a href="{{ '/' | relative_url }}" class="cat-btn {% if page.url == '/' %}active{% endif %}">其他</a>
+      <a href="{{ '/daily/' | relative_url }}" class="cat-btn">日常</a>
+      <a href="{{ '/archive/' | relative_url }}" class="cat-btn">归档</a>
+      <a href="{{ '/about/' | relative_url }}" class="cat-btn">关于</a>
+    </nav>
+
+    <main>
+      {{ content }}
+    </main>
+
+    <footer>
+      <p>© 2026 不知名白日梦</p>
+    </footer>
+  </div>
+</body>
+</html>
