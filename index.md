@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 首页
+title:
 ---
 
 {% for post in site.posts %}
