@@ -13,6 +13,7 @@ const grab = r => [...r.children].filter(x => !x.matches('header,.categories,foo
 Promise.all(L.map((a, i) => i === cur ? null :
   fetch(a.href).then(r => r.ok ? r.text() : Promise.reject()).then(t => new DOMParser().parseFromString(t, 'text/html'))
 )).then(docs => {
+L.forEach(a => { a.dataset.u = a.href; a.removeAttribute('href'); a.tabIndex = 0; });
 const root = document.documentElement, foot = C.querySelector('footer'), n = L.length;
 const bodies = docs.map((d, i) => {
   if (i === cur) return grab(C);
@@ -38,7 +39,7 @@ let tick = false, act = -1, drag = null, settling = false, suppress = false, raf
 const W = () => pager.clientWidth;
 const place = p => {
   const i = clamp(Math.floor(p), 0, n - 1), f = Math.min(1, p - i), a = L[i], b = L[Math.min(i + 1, n - 1)];
-  ind.style.transform = `translate3d(${lerp(a.offsetLeft, b.offsetLeft, f)}px,0,0)`;
+  ind.style.translate = lerp(a.offsetLeft, b.offsetLeft, f) + 'px 0';
   ind.style.width = lerp(a.offsetWidth, b.offsetWidth, f) + 'px';
 };
 const paint = k => L.forEach((l, j) => l.classList.toggle('active', j === k));
@@ -52,11 +53,11 @@ const update = () => {
   if (k !== act) { act = k; paint(k); }
 };
 pager.addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(update); } }, { passive: true });
-const sync = () => { if (act >= 0) history.replaceState(null, '', L[act].href); };
+const sync = () => { if (act >= 0) history.replaceState(null, '', L[act].dataset.u); };
 if ('onscrollend' in window) pager.addEventListener('scrollend', sync);
 else pager.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(sync, 140); }, { passive: true });
 L.forEach((a, i) => {
-  a.draggable = false;
+  a.addEventListener('keydown', e => e.key === 'Enter' && a.click());
   a.addEventListener('click', e => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
     e.preventDefault();
@@ -114,6 +115,7 @@ const end = e => {
 };
 cats.addEventListener('pointerup', end);
 cats.addEventListener('pointercancel', end);
+cats.addEventListener('lostpointercapture', end);
 
 const setH = () => root.style.setProperty('--hdr-h', bar.offsetHeight + 12 + 'px');
 new ResizeObserver(() => { setH(); update(); }).observe(bar);
