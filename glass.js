@@ -5,7 +5,7 @@ const hd = C && C.querySelector('header');
 if (!cats || !hd || !window.fetch) return;
 const L = [...cats.querySelectorAll('a.cat-btn')];
 if (L.length < 2) return;
-const norm = u => { let p = new URL(u, location.href).pathname.replace(/index\.html$/, ''); return p.length > 1 ? p.replace(/\/$/, '') : p; };
+const norm = u => { let p = new URL(u, location.href).pathname.replace(/index\.html\( /, ''); return p.length > 1 ? p.replace(/\/ \)/, '') : p; };
 const cur = L.findIndex(a => norm(a.href) === norm(location.href));
 if (cur < 0) return;
 const grab = r => [...r.children].filter(x => !x.matches('header,.categories,footer,script,style'));
@@ -33,35 +33,6 @@ bodies.forEach(nodes => {
 });
 if (foot) foot.remove();
 C.append(bar, pager); document.body.prepend(bg); root.classList.add('glass-on');
-
-let collapsed = true;
-const setCollapsed = (v) => {
-  collapsed = v;
-  bar.classList.toggle('collapsed', v);
-  setH();
-};
-setCollapsed(true);
-
-bar.addEventListener('click', (e) => {
-  if (drag && drag.on) return;
-  if (e.target.closest('.cat-btn') && collapsed) {
-    setCollapsed(false);
-    return;
-  }
-  setCollapsed(!collapsed);
-});
-
-const panes = [...pager.querySelectorAll('.pane')];
-panes.forEach(pane => {
-  let lastY = 0;
-  pane.addEventListener('scroll', () => {
-    const y = pane.scrollTop;
-    if (y > lastY + 30 && !collapsed) {
-      setCollapsed(true);
-    }
-    lastY = y;
-  }, { passive: true });
-});
 
 const lerp = (a, b, t) => a + (b - a) * t, clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 let tick = false, act = -1, drag = null, settling = false, suppress = false, raf = 0, st = 0, t;
@@ -149,6 +120,37 @@ cats.addEventListener('lostpointercapture', end);
 const setH = () => root.style.setProperty('--hdr-h', bar.offsetHeight + 12 + 'px');
 new ResizeObserver(() => { setH(); update(); }).observe(bar);
 setH();
+
+// ---------- 导航栏折叠 / 展开 ----------
+let collapsed = true;
+const setCollapsed = (v) => {
+  collapsed = v;
+  bar.classList.toggle('collapsed', v);
+  setH();
+};
+setCollapsed(true);
+
+bar.addEventListener('click', (e) => {
+  if (drag && drag.on) return;
+  if (e.target.closest('.cat-btn') && collapsed) {
+    setCollapsed(false);
+    return;
+  }
+  setCollapsed(!collapsed);
+});
+
+const panes = [...pager.querySelectorAll('.pane')];
+panes.forEach(pane => {
+  let lastY = 0;
+  pane.addEventListener('scroll', () => {
+    const y = pane.scrollTop;
+    if (y > lastY + 30 && !collapsed) {
+      setCollapsed(true);
+    }
+    lastY = y;
+  }, { passive: true });
+});
+
 const align = () => { pager.style.scrollBehavior = 'auto'; pager.scrollLeft = (act < 0 ? cur : act) * W(); update(); };
 align();
 addEventListener('resize', align);
