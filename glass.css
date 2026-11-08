@@ -75,14 +75,14 @@ html.glass-on, html.glass-on body { height: 100%; overflow: hidden; }
   position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; border-radius: 999px;
   background: rgba(255, 255, 255, .62);
   box-shadow: 0 2px 10px rgba(139, 107, 58, .18), inset 0 1px 0 #fff;
-  will-change: transform, width, scale;
+  will-change: translate, width, scale;
   transition: scale .42s cubic-bezier(.3, 1.6, .5, 1), background .25s, box-shadow .25s;
 }
 /* 按住：像 iPhone 那样放大成一块透亮的玻璃 */
 /* 松手后：玻璃缩回并滑到目标标签，与页面滑动同时进行 */
 .gind.settle {
   transition: scale .42s cubic-bezier(.3, 1.6, .5, 1),
-              transform .5s cubic-bezier(.2, .9, .25, 1),
+              translate .5s cubic-bezier(.2, .9, .25, 1),
               width .5s cubic-bezier(.2, .9, .25, 1),
               background .25s, box-shadow .25s;
 }
