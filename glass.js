@@ -1,4 +1,3 @@
-
 (() => {
   const C = document.querySelector('.container');
   const cats = C && C.querySelector('.categories');
