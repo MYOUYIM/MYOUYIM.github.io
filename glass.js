@@ -39,7 +39,7 @@ let tick = false, act = -1, drag = null, settling = false, suppress = false, raf
 const W = () => pager.clientWidth;
 const place = p => {
   const i = clamp(Math.floor(p), 0, n - 1), f = Math.min(1, p - i), a = L[i], b = L[Math.min(i + 1, n - 1)];
-  ind.style.translate = lerp(a.offsetLeft, b.offsetLeft, f) + 'px 0';
+  ind.style.transform = `translateX(${lerp(a.offsetLeft, b.offsetLeft, f)}px)`;
   ind.style.width = lerp(a.offsetWidth, b.offsetWidth, f) + 'px';
 };
 const paint = k => L.forEach((l, j) => l.classList.toggle('active', j === k));
@@ -66,7 +66,7 @@ L.forEach((a, i) => {
 });
 cats.addEventListener('contextmenu', e => e.preventDefault());
 
-// 按住玻璃：放大 -> 只有玻璃跟手 -> 松手后页面才跳转
+// 按住滑动指示器
 const X = e => e.clientX - cats.getBoundingClientRect().left;
 const xToP = x => {
   const c = L.map(l => l.offsetLeft + l.offsetWidth / 2);
@@ -121,16 +121,14 @@ const setH = () => root.style.setProperty('--hdr-h', bar.offsetHeight + 12 + 'px
 new ResizeObserver(() => { setH(); update(); }).observe(bar);
 setH();
 
-// ---------- 导航栏折叠（轻量流畅版） ----------
+// ---------- 导航栏折叠 ----------
 let collapsed = true;
 
 const setCollapsed = (v) => {
   if (collapsed === v) return;
   collapsed = v;
   bar.classList.toggle('collapsed', v);
-  requestAnimationFrame(() => {
-    requestAnimationFrame(setH);
-  });
+  requestAnimationFrame(() => requestAnimationFrame(setH));
 };
 
 setCollapsed(true);
@@ -148,22 +146,23 @@ const panes = [...pager.querySelectorAll('.pane')];
 panes.forEach(pane => {
   let lastY = 0;
   let locked = false;
-
   pane.addEventListener('scroll', () => {
     if (locked) return;
     locked = true;
     requestAnimationFrame(() => {
       const y = pane.scrollTop;
-      if (y > lastY + 50 && !collapsed) {
-        setCollapsed(true);
-      }
+      if (y > lastY + 50 && !collapsed) setCollapsed(true);
       lastY = y;
       locked = false;
     });
   }, { passive: true });
 });
 
-const align = () => { pager.style.scrollBehavior = 'auto'; pager.scrollLeft = (act < 0 ? cur : act) * W(); update(); };
+const align = () => {
+  pager.style.scrollBehavior = 'auto';
+  pager.scrollLeft = (act < 0 ? cur : act) * W();
+  update();
+};
 align();
 addEventListener('resize', align);
 }).catch(() => {});
