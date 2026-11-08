@@ -32,9 +32,11 @@ bodies.forEach(nodes => {
   pane.append(inner); pager.append(pane);
 });
 if (foot) foot.remove();
-C.append(bar, pager); document.body.prepend(bg); root.classList.add('glass-on');
+C.append(bar, pager);
+document.body.prepend(bg);
+root.classList.add('glass-on');
 
-// 禁止内容区域横向滑动
+// 禁止内容区横向滑动
 pager.style.overflowX = 'hidden';
 pager.style.touchAction = 'pan-y';
 
@@ -61,21 +63,15 @@ const goTo = (i) => {
   history.replaceState(null, '', L[i].dataset.u);
 };
 
-// 点击导航按钮切换
+// 点击切换
 L.forEach((a, i) => {
   a.addEventListener('click', e => {
     e.preventDefault();
     goTo(i);
   });
-  a.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      goTo(i);
-    }
-  });
 });
 
-// ========== 只在导航栏上滑动切换 ==========
+// 导航栏滑动切换
 const X = e => e.clientX - cats.getBoundingClientRect().left;
 const xToP = x => {
   const c = L.map(l => l.offsetLeft + l.offsetWidth / 2);
@@ -84,7 +80,6 @@ const xToP = x => {
   let i = 0; while (x > c[i + 1]) i++;
   return i + (x - c[i]) / (c[i + 1] - c[i]);
 };
-const vib = ms => navigator.vibrate && navigator.vibrate(ms);
 
 const begin = e => {
   drag.on = true;
@@ -93,7 +88,6 @@ const begin = e => {
   ind.classList.remove('settle');
   cats.setPointerCapture(e.pointerId);
   ind.classList.add('grab');
-  vib(8);
 };
 
 const apply = () => {
@@ -110,7 +104,6 @@ const apply = () => {
   if (k !== drag.k) {
     drag.k = k;
     paint(k);
-    vib(6);
   }
 };
 
@@ -118,8 +111,6 @@ cats.addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse' && e.button) return;
   const x = X(e);
   drag = { id: e.pointerId, x0: x, x, on: false, v: 0, k: act, p: act, t: performance.now() };
-  const a = L[act];
-  if (x >= a.offsetLeft - 20 && x <= a.offsetLeft + a.offsetWidth + 20) begin(e);
 });
 
 cats.addEventListener('pointermove', e => {
@@ -146,7 +137,7 @@ const end = e => {
   st = setTimeout(() => {
     settling = false;
     ind.classList.remove('settle');
-  }, 500);
+  }, 400);
 };
 
 cats.addEventListener('pointerup', end);
@@ -158,54 +149,9 @@ paint(act);
 place(act);
 pager.scrollLeft = act * W();
 
-const setH = () => root.style.setProperty('--hdr-h', bar.offsetHeight + 12 + 'px');
-new ResizeObserver(() => { setH(); place(act); }).observe(bar);
-setH();
-
-// ---------- 导航栏折叠 ----------
-let collapsed = true;
-
-const setCollapsed = (v) => {
-  if (collapsed === v) return;
-  collapsed = v;
-  bar.classList.toggle('collapsed', v);
-  requestAnimationFrame(() => requestAnimationFrame(setH));
-};
-
-setCollapsed(true);
-
-bar.addEventListener('click', (e) => {
-  if (drag && drag.on) return;
-  if (e.target.closest('.cat-btn') && collapsed) {
-    setCollapsed(false);
-    return;
-  }
-  if (!e.target.closest('.cat-btn')) {
-    setCollapsed(!collapsed);
-  }
-});
-
-// 滚动内容时自动折叠
-const panes = [...pager.querySelectorAll('.pane')];
-panes.forEach(pane => {
-  let lastY = 0;
-  let locked = false;
-  pane.addEventListener('scroll', () => {
-    if (locked) return;
-    locked = true;
-    requestAnimationFrame(() => {
-      const y = pane.scrollTop;
-      if (y > lastY + 50 && !collapsed) setCollapsed(true);
-      lastY = y;
-      locked = false;
-    });
-  }, { passive: true });
-});
-
 addEventListener('resize', () => {
   pager.scrollLeft = act * W();
   place(act);
-  setH();
 });
 }).catch(() => {});
 })();
