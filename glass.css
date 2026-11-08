@@ -44,31 +44,40 @@
 html.glass-on, html.glass-on body { height: 100%; overflow: hidden; }
 .glass-on .container { max-width: none; padding: 0; }
 
+/* 底部导航栏 */
 .glass-on .gbar {
-  position: fixed; z-index: 10; top: 12px; left: 50%;
-  width: min(680px, calc(100% - 24px)); transform: translateX(-50%);
-  padding: 14px 16px 12px; text-align: center;
+  position: fixed;
+  z-index: 10;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100% - 24px));
+  padding: 10px 14px;
+  text-align: center;
   border-radius: 28px;
   background: var(--glass-bg);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, .9);
-  transition: padding .25s ease, border-radius .25s ease, background .25s ease;
-  overflow: hidden;
 }
-.glass-on .gbar header {
-  margin: 0;
-  transition: opacity .2s ease, height .25s ease, margin .25s ease;
-}
-.glass-on .gbar h1 { font-size: 1.35rem; margin: 0; }
-.glass-on .gbar .subtitle { font-size: .8rem; line-height: 1.4; }
+
+.glass-on .gbar header { display: none; } /* 底部导航不显示标题 */
+
 .glass-on .gbar .categories {
-  position: relative; gap: 2px; margin: 10px 0 0; flex-wrap: nowrap;
+  position: relative;
+  gap: 2px;
+  margin: 0;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
+
 .glass-on .cat-btn {
-  position: relative; z-index: 1; border-color: transparent;
-  padding: 7px 16px; -webkit-tap-highlight-color: transparent;
+  position: relative;
+  z-index: 1;
+  border-color: transparent;
+  padding: 8px 16px;
+  -webkit-tap-highlight-color: transparent;
   transition: color .25s;
 }
 .glass-on .cat-btn.active,
@@ -77,70 +86,54 @@ html.glass-on, html.glass-on body { height: 100%; overflow: hidden; }
 
 /* 滑动指示器 */
 .gind {
-  position: absolute; z-index: 0; top: 0; bottom: 0; left: 0; border-radius: 999px;
+  position: absolute;
+  z-index: 0;
+  top: 0; bottom: 0; left: 0;
+  border-radius: 999px;
   background: rgba(255, 255, 255, .62);
   box-shadow: 0 2px 10px rgba(139, 107, 58, .18), inset 0 1px 0 #fff;
   will-change: transform, width;
-  transition: transform .42s cubic-bezier(.3, 1.6, .5, 1), width .42s cubic-bezier(.3, 1.6, .5, 1), background .25s, box-shadow .25s;
+  transition: transform .42s cubic-bezier(.3, 1.6, .5, 1), width .42s cubic-bezier(.3, 1.6, .5, 1);
 }
 .gind.settle {
-  transition: transform .5s cubic-bezier(.2, .9, .25, 1),
-              width .5s cubic-bezier(.2, .9, .25, 1),
-              background .25s, box-shadow .25s;
+  transition: transform .5s cubic-bezier(.2, .9, .25, 1), width .5s cubic-bezier(.2, .9, .25, 1);
 }
 .gind.grab {
-  transform: scale(1.3, 1.55);
+  transform: scale(1.25, 1.4);
   background: linear-gradient(160deg, rgba(255,255,255,.78), rgba(255,255,255,.26));
-  box-shadow: 0 10px 28px rgba(139, 107, 58, .30),
-              inset 0 0 0 1.5px rgba(255,255,255,.95),
-              inset 0 2px 8px rgba(255,255,255,.9);
-}
-.glass-on .gbar .categories {
-  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
 }
 
-/* 横向分页器（禁止内容区横向滑动） */
+.glass-on .gbar .categories {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* 内容区域 */
 .pager {
-  position: fixed; inset: 0; display: flex;
+  position: fixed;
+  inset: 0;
+  display: flex;
   overflow-x: hidden !important;
   overflow-y: hidden;
   touch-action: pan-y;
-  scroll-snap-type: none;
-  overscroll-behavior-x: none;
-  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 .pager::-webkit-scrollbar { display: none; }
+
 .pane {
-  flex: 0 0 100%; height: 100%;
-  overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: none;
-  padding: calc(var(--hdr-h, 130px) + 24px) 24px 60px;
+  flex: 0 0 100%;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 24px 24px 100px; /* 底部留出导航栏空间 */
 }
 .pane::-webkit-scrollbar { display: none; }
 .pane-inner { max-width: 680px; margin: 0 auto; }
+
 .glass-on footer { margin-top: 30px; }
 
 @media (prefers-reduced-motion: reduce) {
   .glass-bg i::after { animation: none; }
-}
-
-/* ---------- 折叠导航栏 ---------- */
-.glass-on .gbar.collapsed {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  border-radius: 999px;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  background: rgba(255, 253, 245, 0.92);
-}
-
-.glass-on .gbar.collapsed header {
-  opacity: 0;
-  height: 0;
-  margin: 0 !important;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.glass-on .gbar.collapsed .categories {
-  margin-top: 0;
 }
