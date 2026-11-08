@@ -34,6 +34,35 @@ bodies.forEach(nodes => {
 if (foot) foot.remove();
 C.append(bar, pager); document.body.prepend(bg); root.classList.add('glass-on');
 
+let collapsed = true;
+const setCollapsed = (v) => {
+  collapsed = v;
+  bar.classList.toggle('collapsed', v);
+  setH();
+};
+setCollapsed(true);
+
+bar.addEventListener('click', (e) => {
+  if (drag && drag.on) return;
+  if (e.target.closest('.cat-btn') && collapsed) {
+    setCollapsed(false);
+    return;
+  }
+  setCollapsed(!collapsed);
+});
+
+const panes = [...pager.querySelectorAll('.pane')];
+panes.forEach(pane => {
+  let lastY = 0;
+  pane.addEventListener('scroll', () => {
+    const y = pane.scrollTop;
+    if (y > lastY + 30 && !collapsed) {
+      setCollapsed(true);
+    }
+    lastY = y;
+  }, { passive: true });
+});
+
 const lerp = (a, b, t) => a + (b - a) * t, clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 let tick = false, act = -1, drag = null, settling = false, suppress = false, raf = 0, st = 0, t;
 const W = () => pager.clientWidth;
