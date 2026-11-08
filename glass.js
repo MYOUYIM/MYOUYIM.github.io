@@ -34,39 +34,48 @@ bodies.forEach(nodes => {
 if (foot) foot.remove();
 C.append(bar, pager); document.body.prepend(bg); root.classList.add('glass-on');
 
+// 禁止内容区域横向滑动
+pager.style.overflowX = 'hidden';
+pager.style.touchAction = 'pan-y';
+
 const lerp = (a, b, t) => a + (b - a) * t, clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-let tick = false, act = -1, drag = null, settling = false, suppress = false, raf = 0, st = 0, t;
+let act = cur, drag = null, settling = false, raf = 0, st = 0;
 const W = () => pager.clientWidth;
-const place = p => {
-  const i = clamp(Math.floor(p), 0, n - 1), f = Math.min(1, p - i), a = L[i], b = L[Math.min(i + 1, n - 1)];
+
+const place = (p) => {
+  const i = clamp(Math.floor(p), 0, n - 1);
+  const f = Math.min(1, p - i);
+  const a = L[i], b = L[Math.min(i + 1, n - 1)];
   ind.style.transform = `translateX(${lerp(a.offsetLeft, b.offsetLeft, f)}px)`;
   ind.style.width = lerp(a.offsetWidth, b.offsetWidth, f) + 'px';
 };
 const paint = k => L.forEach((l, j) => l.classList.toggle('active', j === k));
-const update = () => {
-  tick = false;
-  const p = pager.scrollLeft / W();
-  bg.style.setProperty('--p', p.toFixed(3));
-  if ((drag && drag.on) || settling) return;
-  place(p);
-  const k = Math.round(p);
-  if (k !== act) { act = k; paint(k); }
+
+const goTo = (i) => {
+  i = clamp(i, 0, n - 1);
+  if (i === act && !settling) return;
+  act = i;
+  paint(i);
+  place(i);
+  pager.scrollTo({ left: i * W(), behavior: 'smooth' });
+  history.replaceState(null, '', L[i].dataset.u);
 };
-pager.addEventListener('scroll', () => { if (!tick) { tick = true; requestAnimationFrame(update); } }, { passive: true });
-const sync = () => { if (act >= 0) history.replaceState(null, '', L[act].dataset.u); };
-if ('onscrollend' in window) pager.addEventListener('scrollend', sync);
-else pager.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(sync, 140); }, { passive: true });
+
+// 点击导航按钮切换
 L.forEach((a, i) => {
-  a.addEventListener('keydown', e => e.key === 'Enter' && a.click());
   a.addEventListener('click', e => {
-    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
     e.preventDefault();
-    if (!suppress) pager.scrollTo({ left: i * W(), behavior: 'smooth' });
+    goTo(i);
+  });
+  a.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      goTo(i);
+    }
   });
 });
-cats.addEventListener('contextmenu', e => e.preventDefault());
 
-// 按住滑动指示器
+// ========== 只在导航栏上滑动切换 ==========
 const X = e => e.clientX - cats.getBoundingClientRect().left;
 const xToP = x => {
   const c = L.map(l => l.offsetLeft + l.offsetWidth / 2);
@@ -76,49 +85,81 @@ const xToP = x => {
   return i + (x - c[i]) / (c[i + 1] - c[i]);
 };
 const vib = ms => navigator.vibrate && navigator.vibrate(ms);
+
 const begin = e => {
-  drag.on = true; clearTimeout(st); settling = false; ind.classList.remove('settle');
-  cats.setPointerCapture(e.pointerId); ind.classList.add('grab'); vib(8);
+  drag.on = true;
+  clearTimeout(st);
+  settling = false;
+  ind.classList.remove('settle');
+  cats.setPointerCapture(e.pointerId);
+  ind.classList.add('grab');
+  vib(8);
 };
+
 const apply = () => {
-  raf = 0; if (!drag) return;
-  const p = xToP(drag.x), now = performance.now(), dt = now - drag.t;
+  raf = 0;
+  if (!drag) return;
+  const p = xToP(drag.x);
+  const now = performance.now();
+  const dt = now - drag.t;
   if (dt > 0) drag.v = drag.v * .6 + .4 * (p - drag.p) / dt;
-  drag.p = p; drag.t = now; place(p);
+  drag.p = p;
+  drag.t = now;
+  place(p);
   const k = Math.round(p);
-  if (k !== drag.k) { drag.k = k; paint(k); vib(6); }
+  if (k !== drag.k) {
+    drag.k = k;
+    paint(k);
+    vib(6);
+  }
 };
+
 cats.addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse' && e.button) return;
-  const x = X(e), a = L[Math.max(0, act)];
-  drag = { id: e.pointerId, x0: x, x, on: false, v: 0, k: act, p: Math.max(0, act), t: performance.now() };
-  if (x >= a.offsetLeft && x <= a.offsetLeft + a.offsetWidth) begin(e);
+  const x = X(e);
+  drag = { id: e.pointerId, x0: x, x, on: false, v: 0, k: act, p: act, t: performance.now() };
+  const a = L[act];
+  if (x >= a.offsetLeft - 20 && x <= a.offsetLeft + a.offsetWidth + 20) begin(e);
 });
+
 cats.addEventListener('pointermove', e => {
   if (!drag || e.pointerId !== drag.id) return;
   const x = X(e);
-  if (!drag.on) { if (Math.abs(x - drag.x0) < 8) return; begin(e); }
+  if (!drag.on) {
+    if (Math.abs(x - drag.x0) < 8) return;
+    begin(e);
+  }
   drag.x = x;
   if (!raf) raf = requestAnimationFrame(apply);
 });
+
 const end = e => {
   if (!drag || e.pointerId !== drag.id) return;
-  const d = drag; drag = null;
+  const d = drag;
+  drag = null;
   if (!d.on) return;
-  suppress = true; setTimeout(() => { suppress = false; }, 60);
   ind.classList.remove('grab');
   const dest = clamp(Math.round(d.p + d.v * 160), 0, n - 1);
-  act = dest; paint(dest);
-  settling = true; ind.classList.add('settle'); place(dest);
-  pager.scrollTo({ left: dest * W(), behavior: 'smooth' });
-  st = setTimeout(() => { settling = false; ind.classList.remove('settle'); update(); }, 650);
+  settling = true;
+  ind.classList.add('settle');
+  goTo(dest);
+  st = setTimeout(() => {
+    settling = false;
+    ind.classList.remove('settle');
+  }, 500);
 };
+
 cats.addEventListener('pointerup', end);
 cats.addEventListener('pointercancel', end);
 cats.addEventListener('lostpointercapture', end);
 
+// 初始化
+paint(act);
+place(act);
+pager.scrollLeft = act * W();
+
 const setH = () => root.style.setProperty('--hdr-h', bar.offsetHeight + 12 + 'px');
-new ResizeObserver(() => { setH(); update(); }).observe(bar);
+new ResizeObserver(() => { setH(); place(act); }).observe(bar);
 setH();
 
 // ---------- 导航栏折叠 ----------
@@ -139,9 +180,12 @@ bar.addEventListener('click', (e) => {
     setCollapsed(false);
     return;
   }
-  setCollapsed(!collapsed);
+  if (!e.target.closest('.cat-btn')) {
+    setCollapsed(!collapsed);
+  }
 });
 
+// 滚动内容时自动折叠
 const panes = [...pager.querySelectorAll('.pane')];
 panes.forEach(pane => {
   let lastY = 0;
@@ -158,12 +202,10 @@ panes.forEach(pane => {
   }, { passive: true });
 });
 
-const align = () => {
-  pager.style.scrollBehavior = 'auto';
-  pager.scrollLeft = (act < 0 ? cur : act) * W();
-  update();
-};
-align();
-addEventListener('resize', align);
+addEventListener('resize', () => {
+  pager.scrollLeft = act * W();
+  place(act);
+  setH();
+});
 }).catch(() => {});
 })();
