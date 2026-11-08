@@ -55,6 +55,10 @@ html.glass-on, html.glass-on body { height: 100%; overflow: hidden; }
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-shadow), inset 0 1px 0 rgba(255, 255, 255, .9);
+  transition: padding .35s cubic-bezier(.2,.9,.25,1),
+              border-radius .35s,
+              box-shadow .35s;
+  overflow: hidden;
 }
 .glass-on .gbar header { margin: 0; }
 .glass-on .gbar h1 { font-size: 1.35rem; margin: 0; }
@@ -119,13 +123,8 @@ html.glass-on, html.glass-on body { height: 100%; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .glass-bg i::after { animation: none; }
 }
-.glass-on .gbar {
-  transition: padding .35s cubic-bezier(.2,.9,.25,1),
-              border-radius .35s,
-              box-shadow .35s;
-  overflow: hidden;
-}
 
+/* ---------- 折叠导航栏 ---------- */
 .glass-on .gbar.collapsed {
   padding: 8px 14px;
   border-radius: 999px;
