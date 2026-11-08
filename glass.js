@@ -117,7 +117,7 @@ cats.addEventListener('pointermove', e => {
   if (!drag || e.pointerId !== drag.id) return;
   const x = X(e);
   if (!drag.on) {
-    if (Math.abs(x - drag.x0) < 8) return;
+    if (Math.absMath.abs(x - drag.x0) < 8) return;
     begin(e);
   }
   drag.x = x;
