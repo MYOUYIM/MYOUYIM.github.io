@@ -121,13 +121,18 @@ const setH = () => root.style.setProperty('--hdr-h', bar.offsetHeight + 12 + 'px
 new ResizeObserver(() => { setH(); update(); }).observe(bar);
 setH();
 
-// ---------- 导航栏折叠 / 展开 ----------
+// ---------- 导航栏折叠（轻量流畅版） ----------
 let collapsed = true;
+
 const setCollapsed = (v) => {
+  if (collapsed === v) return;
   collapsed = v;
   bar.classList.toggle('collapsed', v);
-  setH();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(setH);
+  });
 };
+
 setCollapsed(true);
 
 bar.addEventListener('click', (e) => {
@@ -142,12 +147,19 @@ bar.addEventListener('click', (e) => {
 const panes = [...pager.querySelectorAll('.pane')];
 panes.forEach(pane => {
   let lastY = 0;
+  let locked = false;
+
   pane.addEventListener('scroll', () => {
-    const y = pane.scrollTop;
-    if (y > lastY + 30 && !collapsed) {
-      setCollapsed(true);
-    }
-    lastY = y;
+    if (locked) return;
+    locked = true;
+    requestAnimationFrame(() => {
+      const y = pane.scrollTop;
+      if (y > lastY + 50 && !collapsed) {
+        setCollapsed(true);
+      }
+      lastY = y;
+      locked = false;
+    });
   }, { passive: true });
 });
 
