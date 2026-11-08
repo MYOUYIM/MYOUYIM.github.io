@@ -24,20 +24,17 @@
     const root = document.documentElement;
     const footer = container.querySelector('footer');
 
-    // 取各页正文
     const bodies = docs.map((d, i) => {
       if (i === cur) return grab(container);
       const c = d.querySelector('.container');
       return c ? grab(c).map(n => document.importNode(n, true)) : [];
     });
 
-    // 玻璃栏
     const gbar = document.createElement('div'); gbar.className = 'gbar';
     header.contains(cats) ? gbar.append(header) : gbar.append(header, cats);
     const ind = document.createElement('span'); ind.className = 'gind';
     cats.prepend(ind);
 
-    // 分页器
     const pager = document.createElement('div'); pager.className = 'pager';
     bodies.forEach(nodes => {
       const pane = document.createElement('section'); pane.className = 'pane';
@@ -47,7 +44,6 @@
       pane.append(inner); pager.append(pane);
     });
 
-    // 背景
     const bg = document.createElement('div'); bg.className = 'glass-bg';
     bg.innerHTML = '<i></i><i></i><i></i>';
 
@@ -58,47 +54,117 @@
 
     const n = links.length;
     const lerp = (a, b, t) => a + (b - a) * t;
-    let ticking = false, activeIdx = -1;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    let ticking = false, activeIdx = -1, drag = null, settling = false;
+
+    // 把玻璃滑块放到连续位置 p（0 ~ n-1）
+    const place = p => {
+      const i = clamp(Math.floor(p), 0, n - 1), f = Math.min(1, p - i);
+      const a = links[i], b = links[Math.min(i + 1, n - 1)];
+      ind.style.transform = `translate3d(${lerp(a.offsetLeft, b.offsetLeft, f)}px,0,0)`;
+      ind.style.width = lerp(a.offsetWidth, b.offsetWidth, f) + 'px';
+    };
+    const paint = act => links.forEach((l, k) => l.classList.toggle('active', k === act));
 
     const update = () => {
       ticking = false;
       const p = pager.scrollLeft / pager.clientWidth;
-      const i = Math.max(0, Math.min(n - 1, Math.floor(p)));
-      const f = Math.min(1, p - i), a = links[i], b = links[Math.min(i + 1, n - 1)];
-      ind.style.transform = `translate3d(${lerp(a.offsetLeft, b.offsetLeft, f)}px,0,0)`;
-      ind.style.width = lerp(a.offsetWidth, b.offsetWidth, f) + 'px';
       bg.style.setProperty('--p', p.toFixed(3));
+      if ((drag && drag.started) || settling) return;   // 拖动/落位期间，玻璃不由页面带动
+      place(p);
       const act = Math.round(p);
-      if (act !== activeIdx) {
-        activeIdx = act;
-        links.forEach((l, k) => l.classList.toggle('active', k === act));
-      }
+      if (act !== activeIdx) { activeIdx = act; paint(act); }
     };
     pager.addEventListener('scroll', () => {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
 
-    // 滑动停止后同步地址栏（刷新/分享/返回都停在当前页）
+    // 滑动停止后同步地址栏
     let t;
-    const settle = () => history.replaceState(null, '', links[activeIdx].href);
-    if ('onscrollend' in window) pager.addEventListener('scrollend', settle);
-    else pager.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(settle, 140); }, { passive: true });
+    const syncUrl = () => { if (activeIdx >= 0) history.replaceState(null, '', links[activeIdx].href); };
+    if ('onscrollend' in window) pager.addEventListener('scrollend', syncUrl);
+    else pager.addEventListener('scroll', () => { clearTimeout(t); t = setTimeout(syncUrl, 140); }, { passive: true });
 
     // 点击 → 平滑滑动
-    links.forEach((a, i) => a.addEventListener('click', e => {
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
-      e.preventDefault();
-      pager.scrollTo({ left: i * pager.clientWidth, behavior: 'smooth' });
-    }));
+    let suppressClick = false;
+    links.forEach((a, i) => {
+      a.draggable = false;
+      a.addEventListener('click', e => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        if (suppressClick) return;
+        pager.scrollTo({ left: i * pager.clientWidth, behavior: 'smooth' });
+      });
+    });
+    cats.addEventListener('contextmenu', e => e.preventDefault());
 
-    // 玻璃栏高度 → 内容顶部留白
-    const setH = () => root.style.setProperty('--hdr-h', gbar.offsetHeight + 12 + 'px');
-    new ResizeObserver(() => { setH(); update(); }).observe(gbar);
-    setH();
+    // ===== 按住玻璃：放大 → 只有玻璃跟手移动 → 松手后页面才跳转 =====
+    const centers = () => links.map(l => l.offsetLeft + l.offsetWidth / 2);
+    const navX = e => e.clientX - cats.getBoundingClientRect().left;
+    const xToP = x => {
+      const c = centers();
+      if (x <= c[0]) return 0;
+      if (x >= c[n - 1]) return n - 1;
+      let i = 0; while (x > c[i + 1]) i++;
+      return i + (x - c[i]) / (c[i + 1] - c[i]);
+    };
+    let raf = 0, settleTimer = 0;
 
-    // 初始位置 / 旋转屏幕后对齐
-    const align = () => { pager.style.scrollBehavior = 'auto'; pager.scrollLeft = (activeIdx < 0 ? cur : activeIdx) * pager.clientWidth; update(); };
-    align();
-    addEventListener('resize', align);
-  }).catch(() => { /* 抓取失败：保持原样 */ });
-})();
+    const endSettle = () => {
+      settling = false;
+      ind.classList.remove('settle');
+      update();
+    };
+    const begin = e => {
+      drag.started = true;
+      clearTimeout(settleTimer); settling = false; ind.classList.remove('settle');
+      cats.setPointerCapture(e.pointerId);
+      ind.classList.add('grab');
+      if (navigator.vibrate) navigator.vibrate(8);
+    };
+    const applyDrag = () => {
+      raf = 0; if (!drag) return;
+      const p = xToP(drag.x), now = performance.now(), dt = now - drag.lastT;
+      if (dt > 0) drag.vp = drag.vp * .6 + .4 * (p - drag.lastP) / dt;
+      drag.lastP = p; drag.lastT = now;
+      place(p);                                   // 只移动玻璃，页面保持不动
+      const act = Math.round(p);
+      if (act !== drag.idx) {                     // 玻璃经过某个标签：标签高亮 + 轻震
+        drag.idx = act; paint(act);
+        if (navigator.vibrate) navigator.vibrate(6);
+      }
+    };
+
+    cats.addEventListener('pointerdown', e => {
+      if (e.pointerType === 'mouse' && e.button) return;
+      const x = navX(e), a = links[Math.max(0, activeIdx)];
+      drag = { id: e.pointerId, x0: x, x, started: false, vp: 0, idx: activeIdx,
+               lastP: Math.max(0, activeIdx), lastT: performance.now() };
+      if (x >= a.offsetLeft && x <= a.offsetLeft + a.offsetWidth) begin(e);   // 按在当前玻璃上：立刻放大
+    });
+    cats.addEventListener('pointermove', e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const x = navX(e);
+      if (!drag.started) { if (Math.abs(x - drag.x0) < 8) return; begin(e); }
+      drag.x = x;
+      if (!raf) raf = requestAnimationFrame(applyDrag);
+    });
+    const end = e => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const d = drag; drag = null;
+      if (!d.started) return;
+      suppressClick = true; setTimeout(() => { suppressClick = false; }, 60);
+      ind.classList.remove('grab');
+
+      // 玻璃停下的位置（带一点惯性）= 要跳转的页面
+      const dest = clamp(Math.round(d.lastP + d.vp * 160), 0, n - 1);
+      activeIdx = dest; paint(dest);
+
+      settling = true;                            // 玻璃自己落位，页面同时开始滑过去
+      ind.classList.add('settle');
+      place(dest);
+      pager.scrollTo({ left: dest * pager.clientWidth, behavior: 'smooth' });
+      settleTimer = setTimeout(endSettle, 650);
+    };
+    cats.addEventListener('pointerup', end);
+    cats.addEventListene
