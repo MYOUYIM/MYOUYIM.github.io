@@ -119,3 +119,38 @@ html.glass-on, html.glass-on body { height: 100%; overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .glass-bg i::after { animation: none; }
 }
+.glass-on .gbar {
+  transition: padding .35s cubic-bezier(.2,.9,.25,1),
+              border-radius .35s,
+              box-shadow .35s;
+  overflow: hidden;
+}
+
+.glass-on .gbar.collapsed {
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+
+.glass-on .gbar.collapsed header {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: max-height .3s, opacity .25s, margin .3s;
+}
+
+.glass-on .gbar:not(.collapsed) header {
+  max-height: 80px;
+  opacity: 1;
+  transition: max-height .35s cubic-bezier(.2,.9,.25,1), opacity .3s;
+}
+
+.glass-on .gbar.collapsed .categories {
+  margin-top: 0;
+}
+
+.glass-on .gbar.collapsed .cat-btn {
+  padding: 6px 14px;
+  font-size: 0.88rem;
+}
