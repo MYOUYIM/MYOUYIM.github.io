@@ -128,7 +128,6 @@ body {
   color: var(--muted, #88877f);
 }
 
-/* ========== 表单 ========== */
 .invite-form {
   margin-top: 22px;
   display: flex;
@@ -160,6 +159,7 @@ body {
   outline: none;
   -webkit-appearance: none;
   appearance: none;
+  box-sizing: border-box;
 }
 
 .invite-form input::placeholder,
@@ -179,7 +179,8 @@ body {
   line-height: 1.5;
 }
 
-.invite-form .contact {
+.invite-form .contact,
+.invite-form button.contact {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -195,10 +196,11 @@ body {
   cursor: pointer;
   font-family: inherit;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .invite-form .contact:hover,
-.invite-form .contact:active {
+.invite-form button.contact:hover {
   background: #515248;
   color: #f6f4ef;
 }
