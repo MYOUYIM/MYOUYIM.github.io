@@ -45,10 +45,9 @@
             <span class="num">01</span>
             <div>
               <strong>申请访问</strong>
-              <p>通过指定渠道提出访问申请。</p>
+              <p>填写下方表单提出访问申请。</p>
             </div>
           </div>
-
           <div class="step">
             <span class="num">02</span>
             <div>
@@ -56,7 +55,6 @@
               <p>申请由管理员独立核验与确认。</p>
             </div>
           </div>
-
           <div class="step">
             <span class="num">03</span>
             <div>
@@ -74,10 +72,30 @@
           </p>
         </div>
 
-        <a class="contact" href="mailto:myouyim@outlook.com">
-          联系管理员申请访问
-          <span>↗</span>
-        </a>
+        <form action="https://formspree.io/f/xoedpqar" method="POST" class="invite-form">
+          <label>
+            称呼 / 网名
+            <input type="text" name="name" required placeholder="怎么称呼你">
+          </label>
+
+          <label>
+            联系方式（邮箱或社交）
+            <input type="text" name="contact" required placeholder="邮箱 / 小红书 / 等">
+          </label>
+
+          <label>
+            申请说明（可选）
+            <textarea name="message" rows="3" placeholder="简单说下想访问的原因"></textarea>
+          </label>
+
+          <!-- 防垃圾提交 -->
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+          <button type="submit" class="contact">
+            提交访问申请
+            <span>↗</span>
+          </button>
+        </form>
       </article>
     </main>
 
