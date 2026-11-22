@@ -9,6 +9,18 @@ permalink: /:title/
 # 时区
 timezone: Asia/Shanghai
 
-# 排除不需要的文件
+# 排除不需要发布到 GitHub Pages 的本地文件
 exclude:
   - README.md
+  - publish-member.ps1
+  - private
+  - source
+  - plaintext
+  - secrets
+  - tmp
+  - temp
+  - "*.password"
+  - "*.secret"
+  - ".env"
+  - ".env.*"
+  - "member-registry.*"
