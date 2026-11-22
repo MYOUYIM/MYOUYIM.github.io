@@ -132,3 +132,116 @@ footer {
 footer p {
   margin-bottom: 6px;
 }
+/* ========== 访问申请表单（全局生效） ========== */
+.invite-form {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.invite-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--light-text, #8B7A68);
+  width: 100%;
+}
+
+.invite-form input,
+.invite-form textarea {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(139, 107, 58, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  color: var(--text, #5C4B3A);
+  font-family: inherit;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.invite-form input::placeholder,
+.invite-form textarea::placeholder {
+  color: #b0aea5;
+}
+
+.invite-form input:focus,
+.invite-form textarea:focus {
+  border-color: var(--link, #8B6B3A);
+  background: #fff;
+}
+
+.invite-form textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.5;
+}
+
+.invite-form .contact,
+.invite-form button.contact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  padding: 15px 18px;
+  border-radius: 14px;
+  background: #373831;
+  color: #f6f4ef;
+  text-decoration: none;
+  font-size: 15px;
+  transition: 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.invite-form .contact:hover,
+.invite-form button.contact:hover,
+.invite-form .contact:active,
+.invite-form button.contact:active {
+  background: #515248;
+  color: #f6f4ef;
+}
+
+.invitation-card .notice {
+  margin-top: 20px;
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  background: rgba(154, 139, 107, 0.07);
+  border-radius: 14px;
+}
+
+.invitation-card .notice-icon {
+  color: #9a8b6b;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.invitation-card .steps {
+  border-top: 1px solid rgba(90, 90, 70, 0.12);
+}
+
+.invitation-card .step {
+  display: flex;
+  gap: 18px;
+  padding: 18px 0;
+  border-bottom: 1px solid rgba(90, 90, 70, 0.12);
+}
+
+.invitation-card .num {
+  font-size: 12px;
+  color: #9a8b6b;
+  padding-top: 2px;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
