@@ -26,7 +26,6 @@ body {
     sans-serif;
 }
 
-/* ========== 适配统一博客结构 ========== */
 .invitation-card {
   background: rgba(255, 255, 255, .76) !important;
   border: 1px solid rgba(255, 255, 255, .8) !important;
@@ -131,7 +130,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 22px;
+  margin-top: 8px;
   padding: 16px 18px;
   border-radius: 14px;
   background: #373831;
@@ -139,10 +138,52 @@ body {
   text-decoration: none;
   font-size: 14px;
   transition: .2s ease;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
 }
 
 .invitation-card .contact:hover {
   background: #515248;
   transform: translateY(-1px);
   color: #f6f4ef;
+}
+
+/* 表单样式 */
+.invite-form {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.invite-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted, #88877f);
+}
+
+.invite-form input,
+.invite-form textarea {
+  padding: 12px 14px;
+  border: 1px solid rgba(90, 90, 70, .15);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .7);
+  font-size: 14px;
+  color: var(--text, #34352f);
+  font-family: inherit;
+  outline: none;
+}
+
+.invite-form input:focus,
+.invite-form textarea:focus {
+  border-color: var(--accent, #9a8b6b);
+}
+
+.invite-form textarea {
+  resize: vertical;
+  min-height: 72px;
 }
