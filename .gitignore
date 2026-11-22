@@ -1,17 +1,40 @@
+# ==============================
 # Private source files
+# ==============================
 private/
 source/
 plaintext/
 secrets/
+
+# ==============================
+# Passwords and secrets
+# ==============================
 *.password
 *.secret
+*.keystore
+*.jks
 .env
 .env.*
 
+# ==============================
 # Temporary build files
+# ==============================
 tmp/
 temp/
 *.tmp
+member-build-*/
 
-# Local password-management data
+# ==============================
+# Local member management data
+# ==============================
 member-registry.*
+member-passwords.*
+members-private.*
+
+# ==============================
+# Editor and system files
+# ==============================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
