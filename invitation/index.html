@@ -25,21 +25,82 @@
     </nav>
 
     <main>
-      <article class="post">
+      <article class="post invitation-card">
+        <div class="status">
+          <span class="dot"></span>
+          PRIVATE ACCESS GATEWAY
+        </div>
+
+        <div class="symbol">◈</div>
+        <p class="eyebrow">MYOUYIM · PERSONAL SPACE</p>
         <h2>专属访问入口</h2>
-        <p class="date">PRIVATE ACCESS</p>
-        <p>
-          专属内容不公开展示，访问需经人工核验与授权。
-          如需申请，请通过下方方式联系。
+
+        <p class="intro">
+          这里是一个独立的内容访问入口。
+          专属内容不会公开展示，访问需要经过人工核验与授权。
         </p>
-        <p style="margin-top:16px;">
-          <a href="mailto:myouyim@outlook.com">联系管理员 → myouyim@outlook.com</a>
-        </p>
+
+        <div class="steps">
+          <div class="step">
+            <span class="num">01</span>
+            <div>
+              <strong>申请访问</strong>
+              <p>填写下方表单提出访问申请。</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="num">02</span>
+            <div>
+              <strong>人工核验</strong>
+              <p>申请由管理员独立核验与确认。</p>
+            </div>
+          </div>
+          <div class="step">
+            <span class="num">03</span>
+            <div>
+              <strong>定向授权</strong>
+              <p>审核通过后，获得专属链接与访问密码。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="notice">
+          <span class="notice-icon">!</span>
+          <p>
+            本页面不收集身份证号、手机号或其他敏感身份信息。
+            请勿在公开评论区提交个人资料。
+          </p>
+        </div>
+
+        <form action="https://formspree.io/f/xoedpqar" method="POST" class="invite-form">
+          <label>
+            称呼 / 网名
+            <input type="text" name="name" required placeholder="怎么称呼你">
+          </label>
+
+          <label>
+            联系方式（邮箱或社交）
+            <input type="text" name="contact" required placeholder="邮箱 / 小红书 / 等">
+          </label>
+
+          <label>
+            申请说明（可选）
+            <textarea name="message" rows="3" placeholder="简单说下想访问的原因"></textarea>
+          </label>
+
+          <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+
+          <button type="submit" class="contact">
+            提交访问申请
+            <span>↗</span>
+          </button>
+        </form>
       </article>
     </main>
 
     <footer>
-      <p>MYOUYIM / PRIVATE ACCESS</p>
+      <p>ENCRYPTED DISTRIBUTION · HUMAN REVIEW</p>
+      <p>MYOUYIM / PRIVATE ACCESS SYSTEM</p>
     </footer>
   </div>
   <script src="../glass.js" defer></script>
